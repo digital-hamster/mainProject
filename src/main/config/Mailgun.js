@@ -3,10 +3,13 @@ const setting = require("../security/setting")
 const { apiKey, domain } = setting.mailgun
 const mg = mailgun({ apiKey: apiKey, domain: domain })
 
+//const app = require("../app")
+//const { authCodeSend } = app
+
 const Mailgun = {
     resetPassword: async (email) => {
         const tempPassword = Math.random().toString(36).substring(2, 12).toUpperCase()
-        const userName = "MoonJang Jin" // 메일 발신자 이름 (아무거나 짓기)
+        const userName = "digital-hamster.net" // 메일 발신자 이름 (아무거나 짓기)
 
         const data = {
             from: `${userName} <help@${domain.replace("www.", "")}>`,
@@ -25,22 +28,20 @@ const Mailgun = {
         return result
     },
 
-    sendAuthorizationCode: async (email) => {
-        const authorizationCode = Math.random().toString(36).substring(2, 8).toUpperCase()
-        const userName = "MoonJang Jin" // 메일 발신자 이름 (아무거나 짓기)
-
+    sendAuthCode: async (email, authCode) => {
+        const userName = "digital-hamster.net"
         const data = {
             from: `${userName} <help@${domain.replace("www.", "")}>`,
             to: email,
-            subject: `이메일 인증번호입니다.`,
-            text: `인증번호: ${authorizationCode}`,
+            subject: `인증 링크 전달해드립니다`,
+            text: `인증 이후에 재로그인 해주세요: http://localhost:3000/auth?authcode=${authCode}`,
+            //https://www.api.digital-hamster.net/auth?authcode=${authCode}
         }
 
         await mg.messages().send(data)
 
         const result = {
             email: email,
-            authorizationCode: authorizationCode,
         }
 
         return result
