@@ -14,6 +14,9 @@ class ChangeUserPassword {
     }
 
     validate() {
+        if (isNaN(this.userId)){
+            throw Error("아이디 형식이 올바르지 않습니다")
+        }
         if (!this.userId) {
             throw Error("아이디를 입력해주세요")
         }

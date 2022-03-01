@@ -1,3 +1,15 @@
+//api 추가할 때마다 TokenMiddleware.checkList에 추가
+//passlist : 검사안함 . checkList > 검사함
+
+//할 일
+//1. 숫자형 검증, >> api 싺 돌면서 추가해야할 에러 있는지 확인
+//2. 전체 에러 테스트 >> local로 에러 다 내보기
+//3. 관리자 api 만들어야겟다 ;> 재로그인하면 필요 X
+//4. 미들웨어를 거치는 에러중에 낭비만 하는 건 지우기
+//5. passList, checkList 싹 넣기 >> 하나 넣을 때마다 싹 에러내기
+//6. 아 됐는데 왜이리 찝찝해 ..
+//7. 현재 본인 토큰이 최신 토큰인지 검증하기 >> 토큰 안에 permission이 다르다거나, 그런걸 체크해야함 userDao
+//ㄴ> 이거 꼭 권한 바꾸고 다시 시도해보기 당장 테스트는 성공 >> 다른 api에서도 정상 작동 하는지?
 const express = require("express")
 const cors = require("cors")
 const md5 = require("md5")
@@ -185,7 +197,17 @@ async function userLogin(req, res, next) {
         throw Error("로그인 실패")
     }
 
-    res.output = { result: { Token: Auth.signToken(userInform.id, userInform.permission) } }
+    const userPermission = rows[0].permission
+    let formalMember = true
+    let admin = true
+    if (userPermission !== 1) {
+        formalMember = false
+    }
+    if (admin !== 2) {
+        admin = false
+    }
+
+    res.output = { result: { Token: Auth.signToken(userInform.id, userInform.permission) }, ...{formalMember: formalMember, admin: admin} }
     next()
 }
 
@@ -409,7 +431,8 @@ async function updateDocument(req, res, next) {
           WHERE id = ?;`,
         [documentId]
     )
-    if (!permissionCheck[0] || permissionCheck[0].length === 0) {
+    const userInfrom = permissionCheck[0]
+    if (!userInfrom || userInfrom === 0) {
         throw Error("존재하지 않는 사용자입니다")
     }
 
@@ -451,14 +474,14 @@ async function deleteDocument(req, res, next) {
     }
 
     //DB - delete F.K participant
-    await connection.execute(
-        `DELETE p
-           FROM participant AS p
-           JOIN document AS d
-             ON p.document_id = d.id
-          WHERE d.id = ?;`,
-        [documentId]
-    )
+    // await connection.execute(
+    //     `DELETE p
+    //        FROM participant AS p
+    //        JOIN document AS d
+    //          ON p.document_id = d.id
+    //       WHERE d.id = ?;`,
+    //     [documentId]
+    // )
     //DB - delete document
     const [documentResult] = await connection.execute(
         `DELETE

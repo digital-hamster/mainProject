@@ -35,6 +35,8 @@ const Auth = {
             if (jwtPayload.exp < currentTimeStamp) {
                 throw Error("Unauthoriezed: 로그인 유지 시간이 만료되었습니다.")
             }
+
+            return jwtPayload
         } catch (e) {
             if (e.message.startsWith("Unauthoriezed:")) {
                 throw e
@@ -59,7 +61,7 @@ const Auth = {
                 throw Error("검증되지 않은 사용자 입니다")
             }
             if (!jwtPayload.id) {
-                throw Error("존재하지 않는 사용자입니다")
+                throw Error("토큰 정보가 없습니다. 재로그인 뒤 다시 시도해주세요")
             }
             if (jwtPayload.permission === 0) {
                 throw Error("정식회원이 아닙니다")

@@ -33,6 +33,7 @@ class CreateUserRequest {
         if (this.password.length === 0 || this.password.length > 100) {
             throw Error("비밀번호는 100자를 넘지 않습니다")
         }
+        
     }
 }
 
