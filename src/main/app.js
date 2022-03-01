@@ -11,6 +11,7 @@ const CryptoUtil = require("./config/CryptoUtil")
 const Auth = require("./config/Auth")
 const Mailgun = require("./config/Mailgun")
 const aws = require("./config/AWS")
+const TokenMiddleware = require("./config/TokenMiddleware")
 
 const CreateUserRequest = require("./request/CreateUserRequest")
 const LoginUserRequest = require("./request/LoginUserRequest")
@@ -23,11 +24,13 @@ const UpdateDocumentRequest = require("./request/UpdateDocumentRequest")
 const SelectAllDocumentRequest = require("./request/SelectAllDocumentRequest")
 const DelectDocumentRequest = require("./request/DelectDocumentRequest")
 
-const app = express()
+const app = express() //얘는 여기서 한꺼풀 벗겨준거임 >> 함수 안의 함수
 const port = process.env.NODE_ENV === "test" ? 18080 : 8080
 
 app.use(express.json()) // json으로 들어온 요청을 parsing 해준다.
+//한꺼풀 벗기고 여기서 제대로 된 함수 불러준거임
 app.use(cors()) // cors 설정
+app.use(TokenMiddleware.handle) //얘는 express랑 다르게 한 번에
 
 app.post("/test-upload", multer.single("img"), AsyncWrapper.wrap(uploadImage))
 
@@ -44,7 +47,7 @@ async function uploadImage(req, res, next) {
     next()
 }
 
-app.get("/example", AsyncWrapper.wrap(exampleFunc))
+app.get("/example", AsyncWrapper.wrap(exampleFunc)) // 등록하고 미들웨어를 저기서 썻음
 async function exampleFunc(req, res, next) {
     const { error } = req.query
 

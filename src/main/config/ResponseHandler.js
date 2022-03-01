@@ -4,6 +4,10 @@ const ResponseHandler = {
             throw Error("잘못된 API입니다.")
         }
 
+        if (res.dbConnection) {
+            res.dbConnection.release()
+        }
+
         res.status(200)
         res.json(res.output)
     },
