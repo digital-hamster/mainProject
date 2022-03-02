@@ -67,7 +67,7 @@ async function exampleFunc(req, res, next) {
         throw Error("잘못된 요청입니다.")
     }
 
-    res.output = "example API"
+    res.output = req.magic
     next()
 }
 
@@ -183,7 +183,9 @@ async function userLogin(req, res, next) {
     const connection = await Database.getConnection(res)
     // DB - select user information
     const [rows] = await connection.execute(
-        `SELECT id, password, permission
+        `SELECT id,
+                permission,
+                password
            FROM user
           WHERE email = ?;`,
         [CryptoUtil.encrypt(email)]
@@ -308,7 +310,7 @@ async function deleteUser(req, res, next) {
     const connection = await Database.getConnection(res)
     // DB - select user information
     const [userSelect] = await connection.execute(
-        `SELECT *
+        `SELECT id, email
            FROM user
           WHERE id = ?`,
         [userId]
@@ -374,6 +376,17 @@ async function createDocument(req, res, next) {
         [title, imgUrl, userId, category, content, mapLink]
     )
 
+    //프론트에서 독립적으로 주는 userId 받아야 외래키로 연동이 되니까 따로 에러처리를 해 주어야 함 >> 이거 필요한가 ?????
+    //    const [isUser] = await connection.execute(
+    //     `SELECT permission
+    //        FROM user
+    //       WHERE id = ?;`,
+    //     [userId]
+    // )
+    // if (!isUser || isUser.length === 0) {
+    //     throw Error("존재하지 않는 사용자입니다")
+    // }
+
     if (queryResult.changedRows == 0) {
         throw Error("업로드를 실패했습니다")
     }
@@ -399,7 +412,7 @@ async function selectAllDocument(req, res, next) {
         [category, limit, offset]
     )
     if (!queryResults || queryResults.length === 0) {
-        throw Error("없는 카테고리이거나, 관련한 글을 더이상 불러올 수 없습니다")
+        throw Error("관련한 글을 더이상 불러올 수 없습니다")
     }
 
     res.output = { result: queryResults }
@@ -425,16 +438,16 @@ async function updateDocument(req, res, next) {
     }
 
     //DB - permission check
-    const [permissionCheck] = await connection.execute(
-        `SELECT user_id
-           FROM document
-          WHERE id = ?;`,
-        [documentId]
-    )
-    const userInfrom = permissionCheck[0]
-    if (!userInfrom || userInfrom === 0) {
-        throw Error("존재하지 않는 사용자입니다")
-    }
+    // const [permissionCheck] = await connection.execute(
+    //     `SELECT user_id
+    //        FROM document
+    //       WHERE id = ?;`,
+    //     [documentId]
+    // )
+    // const userInfrom = permissionCheck[0]
+    // if (!userInfrom || userInfrom === 0) {
+    //     throw Error("존재하지 않는 사용자입니다")
+    // }
 
     const extension = originalname.split(".")[1]
     const imgUrl = await aws.S3.upload(buffer, mimeType, extension)
@@ -460,17 +473,14 @@ async function deleteDocument(req, res, next) {
 
     const connection = await Database.getConnection(res)
     //DB - permission check
-    const [permissionCheck] = await connection.execute(
+    const [isDocument] = await connection.execute(
         `SELECT user_id
            FROM document
           WHERE id = ?;`,
         [documentId]
     )
-    if (!permissionCheck || permissionCheck.length === 0) {
+    if (!isDocument || isDocument.length === 0) {
         throw Error("존재하지 않는 게시글입니다")
-    }
-    if (permissionCheck[0].user_id !== +userId) {
-        throw Error("작성자가 아닙니다")
     }
 
     //DB - delete F.K participant

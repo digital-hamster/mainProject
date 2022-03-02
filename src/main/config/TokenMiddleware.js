@@ -7,6 +7,8 @@ const AsyncWrapper = require("./AsyncWrapper")
 
 const TokenMiddleware = {
     handle: AsyncWrapper.wrap(async (req, res, next) => {
+        // 넘기는 마술쇼
+        // req.magic = "마술쇼"
         //토큰검사 안하는 경로는 패스
         const path = req.path //path만 받아오기
         const method = req.method //and문 사용해서 조건 추가해주기 >> method만 안 겹치는 경우는 !
@@ -33,13 +35,15 @@ const TokenMiddleware = {
         
         const token = authorization.replace(/Bearer[+\s]/g, "")
         const jwtPayload = Auth.verifyToken(token)
+
+        req.userDetail = jwtPayload //미들웨어 밖으로 값을 넘겨주고 계속 쓸 거임
         
         // 권한 검사 >> 토큰을 사용하지 않는  api를 제외하고 모든 checkList에 있어야 함
         const apiInfo = checkList.find(el => new RegExp(el.path).test(path) && el.method.name === method)
         
         
         if (!apiInfo) {
-            throw Error("존재하지 않는 apiInfo입니다.")
+            throw Error("토큰 정보를 불러올 수 없습니다")//"존재하지 않는 apiInfo입니다."
         }
         //apiInfo 패턴 조건에 맞는 path가 아니면 apiInfo가 들어오지 않음
         //!!!>> 데이터형을 해당 api에서 걸러내는 게 아니라,
@@ -56,10 +60,10 @@ const TokenMiddleware = {
         await AuthService.checkUser(jwtPayload, connection)
 
 
-        // //프론트 본인 vs 서버 본인
+        // //프론트 본인 vs 서버 본인 이 부분을 해야함 !!!!!!
         // if (authorization[0].id !== ){
         //     throw Error("사용자 토큰이 다릅니다")
-        // }
+        // } >> 프론트에서 보내주는 값이 다를 경우는, 해당 api로 가야 함
 
         res.dbConnection = null;
         connection.release();

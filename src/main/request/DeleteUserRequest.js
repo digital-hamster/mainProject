@@ -2,7 +2,7 @@ class DeleteUserRequest {
     userId = 0
 
     constructor(req) {
-        const { userId } = req.params
+        const userId  = req.userDetail.id
 
         this.userId = userId
         this.validate()

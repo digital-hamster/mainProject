@@ -15,7 +15,8 @@ class CreateDocumentRequest {
 
     constructor(req) {
         const { buffer, mimeType, originalname } = req.file
-        const { title, userId, category, content, mapLink } = req.body
+        const { title, category, content, mapLink } = req.body
+        const { userId } = req.userDetail.id
 
         this.title = title
         this.category = category

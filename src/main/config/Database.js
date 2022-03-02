@@ -1,4 +1,3 @@
-const res = require("express/lib/response")
 const mysql = require("mysql2/promise")
 const setting = require("../security/setting")
 

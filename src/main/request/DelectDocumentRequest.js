@@ -4,7 +4,7 @@ class DelectDocumentRequest {
 
     constructor(req) {
         const { documentId } = req.params
-        const { userId } = req.body
+        const { userId } = req.userDetail.id
 
         this.userId = userId
         this.documentId = documentId
