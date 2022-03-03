@@ -1,14 +1,12 @@
-const Auth = require("../config/Auth")
-
 class ChangeUserPassword {
     password = ""
     changePw = ""
     userId = 0
-
+    
     constructor(req) {
         const { password, changePw } = req.body
-        //const { userId } = req.params
-        Auth.verifyToken
+        const userId  = req.userDetail.id
+        
         this.password = password
         this.changePw = changePw
         this.userId = userId

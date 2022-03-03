@@ -205,7 +205,7 @@ async function userLogin(req, res, next) {
     if (userPermission !== 1) {
         formalMember = false
     }
-    if (admin !== 2) {
+    if (userPermission !== 2) {
         admin = false
     }
 
@@ -469,7 +469,7 @@ async function updateDocument(req, res, next) {
 app.delete("/documents/:documentId", AsyncWrapper.wrap(deleteDocument))
 async function deleteDocument(req, res, next) {
     const deleteDocument = new DelectDocumentRequest(req)
-    const { documentId, userId } = deleteDocument
+    const { documentId } = deleteDocument
 
     const connection = await Database.getConnection(res)
     //DB - permission check
