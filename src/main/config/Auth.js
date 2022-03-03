@@ -3,7 +3,7 @@ const setting = require("../security/setting")
 const TOKEN_EXPIRED_TIME = 24 * 60 * 60 * 1000
 // const TOKEN_EXPIRED_TIME = 1
 
-const DOMAIN = "localhost:3000/"
+const DOMAIN = "www.api.digital-hamster.net" //localhost:3000/
 const secretKey = setting.jwt.secretKey
 
 const Auth = {
