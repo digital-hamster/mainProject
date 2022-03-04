@@ -67,19 +67,19 @@ async function exampleFunc(req, res, next) {
         throw Error("잘못된 요청입니다.")
     }
 
-    res.output = req.magic
+    res.output = "example API"
+    // res.output = req.magic
     next()
 }
 
 app.get("/db-test", AsyncWrapper.wrap(dbTestFunc))
 async function dbTestFunc(req, res, next) {
-    const connection = await Database.getConnection() // setting.js 필요!!
+    const connection = await Database.getConnection(res) // setting.js 필요!!
     const [rows] = await connection.execute("SELECT 1", [])
-
     if (rows[0]["1"] !== 1) {
         throw Error("연결 실패")
     }
-
+    
     res.output = "연결 성공"
     next()
 }
@@ -303,6 +303,7 @@ async function changePw(req, res, next) {
 
 // 회원탈퇴
 app.delete("/users/:userId", AsyncWrapper.wrap(deleteUser))
+//app.delete("/users/:userId",TokenMiddleware.handle, AsyncWrapper.wrap(deleteUser)) >>미들웨어를 원하는 곳에만 넣는 방법
 async function deleteUser(req, res, next) {
     const deleteUser = new DeleteUserRequest(req)
     const { userId } = deleteUser

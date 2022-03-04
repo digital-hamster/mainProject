@@ -47,7 +47,7 @@ const TokenMiddleware = {
         }
         //apiInfo 패턴 조건에 맞는 path가 아니면 apiInfo가 들어오지 않음
         //!!!>> 데이터형을 해당 api에서 걸러내는 게 아니라,
-        //미들웨어에서 걸러내는 작업이 필요할 듯함 >> 아 이거 진짜 어렵다 ;;; 어디서 에러를 내야하니
+        //미들웨어에서 걸러내는 작업이 필요할 듯함 >> 어디서 에러를 내야하니
         //api 내에서 형검사 하는게 의미가 없어진다 ... ㄹㅇ 미들웨어에서 막혓어 ..
 
         if (apiInfo.permission > jwtPayload.permission) {
@@ -60,11 +60,6 @@ const TokenMiddleware = {
         await AuthService.checkUser(jwtPayload, connection)
 
 
-        // //프론트 본인 vs 서버 본인 이 부분을 해야함 !!!!!!
-        // if (authorization[0].id !== ){
-        //     throw Error("사용자 토큰이 다릅니다")
-        // } >> 프론트에서 보내주는 값이 다를 경우는, 해당 api로 가야 함
-
         res.dbConnection = null;
         connection.release();
         next()
@@ -74,9 +69,17 @@ const TokenMiddleware = {
 const numberPattern = "/\\d+"
 const allPattern = "/\\w+"
 
-const passList = [
+const passList = [ //pass, check 정적임, 설정값을 모듈로 분리해서, 보기좋은 형태로 모듈화, 파일에 따로 두기 >> 모듈로 분리해서 불러오기!
     {
         path: "/example",
+        method: HttpMethod.GET,
+    },
+    {
+        path: "/db-test",
+        method: HttpMethod.GET,
+    },
+    {
+        path: "/health-check",
         method: HttpMethod.GET,
     },
     {   //회원가입
