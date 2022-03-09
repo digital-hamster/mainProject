@@ -103,6 +103,10 @@ const passList = [ //pass, check 정적임, 설정값을 모듈로 분리해서,
         path: "/documents",
         method: HttpMethod.GET
     },
+    {   //카테고리 항목 조회
+        path: "/categories",
+        method: HttpMethod.GET
+    },
 ]
 
 const checkList = [ //api만들 때마다 여기서 추가해줘야함 >> 최소 권한 검사 + 어쩌꾸.

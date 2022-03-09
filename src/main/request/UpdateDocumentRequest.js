@@ -8,7 +8,7 @@ class UpdateDocumentRequest {
 
     constructor(req) {
         const { buffer, mimeType, originalname } = req.file
-        const { title, userId, content, mapLink } = req.body
+        const { title, userId, content, mapLink, searchWord } = req.body
         const { documentId } = req.params
 
         this.userId = userId
@@ -19,6 +19,7 @@ class UpdateDocumentRequest {
         this.originalname = originalname
         this.content = content
         this.mapLink = mapLink
+        this.searchWord = searchWord
         this.validate()
     }
 
@@ -37,6 +38,9 @@ class UpdateDocumentRequest {
         }
         if (!this.mapLink) {
             throw Error("음식점 관련 정보를 불러올 수 없습니다")
+        }
+        if (!this.searchWord) {
+            throw Error("검색어 정보를 불러올 수 없습니다")
         }
     }
 }

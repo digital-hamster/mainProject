@@ -35,6 +35,8 @@ const CreateDocumentRequest = require("./request/CreateDocumentRequest")
 const UpdateDocumentRequest = require("./request/UpdateDocumentRequest")
 const SelectAllDocumentRequest = require("./request/SelectAllDocumentRequest")
 const DelectDocumentRequest = require("./request/DelectDocumentRequest")
+const CategoryUtil = require("./utils/CategoryUtil")
+const CategoryType = require("./types/CategoryType")
 
 const app = express() //얘는 여기서 한꺼풀 벗겨준거임 >> 함수 안의 함수
 const port = process.env.NODE_ENV === "test" ? 18080 : 8080
@@ -357,12 +359,17 @@ async function deleteUser(req, res, next) {
     res.output = { result: true }
     next()
 }
+//카테고리 항목 조회
+app.get("/categories", (req, res, next) => {
+    res.output = { result: CategoryUtil.enumToArray(CategoryType) }
+    next()
+})
 
 // 게시글 업로드
 app.post("/documents", multer.single("img"), AsyncWrapper.wrap(createDocument))
 async function createDocument(req, res, next) {
     const createRequest = new CreateDocumentRequest(req)
-    const { title, category, userId, buffer, mimeType, originalname, content, mapLink } = createRequest
+    const { title, category, userId, buffer, mimeType, originalname, content, mapLink, searchWord } = createRequest
 
     const connection = await Database.getConnection(res)
 
@@ -372,9 +379,9 @@ async function createDocument(req, res, next) {
     // DB - insert document information
     const [queryResult] = await connection.execute(
         `INSERT INTO
-            document (title, img_link, user_id, category, content, map_link)
-              VALUES (?, ?, ?, ?, ?, ?);`,
-        [title, imgUrl, userId, category, content, mapLink]
+            document (title, img_link, user_id, category, content, map_link, search_word)
+              VALUES (?, ?, ?, ?, ?, ?, ?);`,
+        [title, imgUrl, userId, category, content, mapLink, searchWord]
     )
 
     //프론트에서 독립적으로 주는 userId 받아야 외래키로 연동이 되니까 따로 에러처리를 해 주어야 함 >> 이거 필요한가 ?????
@@ -404,7 +411,7 @@ async function selectAllDocument(req, res, next) {
     const connection = await Database.getConnection(res)
     //DB - document * (category)
     const [queryResults] = await connection.execute(
-        `SELECT id, title, img_link, content, map_link
+        `SELECT id, title, img_link, content, map_link, search_word
            FROM document
           WHERE category = ?
           ORDER BY id DESC
@@ -424,7 +431,7 @@ async function selectAllDocument(req, res, next) {
 app.put("/documents/:documentId", multer.single("img"), AsyncWrapper.wrap(updateDocument))
 async function updateDocument(req, res, next) {
     const documentUpdate = new UpdateDocumentRequest(req)
-    const { documentId, title, buffer, mimeType, originalname, userId, content, mapLink } = documentUpdate
+    const { documentId, title, buffer, mimeType, originalname, content, mapLink, searchWord } = documentUpdate
 
     const connection = await Database.getConnection(res)
     //DB - Exist document
@@ -455,9 +462,9 @@ async function updateDocument(req, res, next) {
 
     const [queryResult] = await connection.execute(
         `UPDATE document
-            SET title = ?, img_link = ?, content = ?, map_link = ?
+            SET title = ?, img_link = ?, content = ?, map_link = ?, search_word = ?
           WHERE id = ?;`,
-        [title, imgUrl, content, mapLink, documentId]
+        [title, imgUrl, content, mapLink, searchWord, documentId]
     )
     if (!queryResult || queryResult.length === 0) {
         throw Error("수정할 데이터가 들어오지 못했습니다")
