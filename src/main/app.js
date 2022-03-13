@@ -414,7 +414,7 @@ async function selectAllDocument(req, res, next) {
     const connection = await Database.getConnection(res)
     //DB - document * (category)
     const [queryResults] = await connection.execute(
-        `SELECT id, title, img_link, content, map_link, search_word
+        `SELECT id, title, img_link, content, search_word
            FROM document
           WHERE category = ?
           ORDER BY id DESC
