@@ -17,7 +17,7 @@ class CreateDocumentRequest {
     constructor(req) {
         const { buffer, mimeType, originalname } = req.file
         const { title, category, content, mapLink, searchWord } = req.body
-        const  userId  = req.userDetail.id
+        const userId = req.userDetail.id
 
         this.title = title
         this.category = category
@@ -49,9 +49,6 @@ class CreateDocumentRequest {
         }
         if (!this.content) {
             throw Error("사용자의 리뷰를 불러올 수 없습니다")
-        }
-        if (!this.mapLink) {
-            throw Error("음식점 관련 정보를 불러올 수 없습니다")
         }
         if (!this.searchWord) {
             throw Error("음식점 정보를 불러 올 검색어가 없습니다")
