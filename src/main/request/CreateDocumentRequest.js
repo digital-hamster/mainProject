@@ -11,7 +11,6 @@ class CreateDocumentRequest {
     originalname = ""
     participant = 0
     content = ""
-    mapLink = ""
     searchWord = ""
 
     constructor(req) {
@@ -26,7 +25,6 @@ class CreateDocumentRequest {
         this.mimeType = mimeType
         this.originalname = originalname
         this.content = content
-        this.mapLink = mapLink
         this.searchWord = searchWord
         this.validate()
     }

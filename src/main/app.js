@@ -81,7 +81,7 @@ async function dbTestFunc(req, res, next) {
     if (rows[0]["1"] !== 1) {
         throw Error("연결 실패")
     }
-    
+
     res.output = "연결 성공"
     next()
 }
@@ -211,7 +211,10 @@ async function userLogin(req, res, next) {
         admin = false
     }
 
-    res.output = { result: { Token: Auth.signToken(userInform.id, userInform.permission) }, ...{formalMember: formalMember, admin: admin} }
+    res.output = {
+        result: { Token: Auth.signToken(userInform.id, userInform.permission) },
+        ...{ formalMember: formalMember, admin: admin },
+    }
     next()
 }
 
@@ -369,7 +372,7 @@ app.get("/categories", (req, res, next) => {
 app.post("/documents", multer.single("img"), AsyncWrapper.wrap(createDocument))
 async function createDocument(req, res, next) {
     const createRequest = new CreateDocumentRequest(req)
-    const { title, category, userId, buffer, mimeType, originalname, content, mapLink, searchWord } = createRequest
+    const { title, category, userId, buffer, mimeType, originalname, content, searchWord } = createRequest
 
     const connection = await Database.getConnection(res)
 
@@ -379,9 +382,9 @@ async function createDocument(req, res, next) {
     // DB - insert document information
     const [queryResult] = await connection.execute(
         `INSERT INTO
-            document (title, img_link, user_id, category, content, map_link, search_word)
-              VALUES (?, ?, ?, ?, ?, ?, ?);`,
-        [title, imgUrl, userId, category, content, mapLink, searchWord]
+            document (title, img_link, user_id, category, content, search_word)
+              VALUES (?, ?, ?, ?, ?, ?);`,
+        [title, imgUrl, userId, category, content, searchWord]
     )
 
     //프론트에서 독립적으로 주는 userId 받아야 외래키로 연동이 되니까 따로 에러처리를 해 주어야 함 >> 이거 필요한가 ?????
